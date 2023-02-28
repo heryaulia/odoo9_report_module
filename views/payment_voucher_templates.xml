@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+     <template id="report_payment_print_finance">
+        <t t-call="report.internal_layout">
+            <div class="page">
+                <img t-if="doc.company_id.logo" t-att-src="'data:image/png;base64,%s' % doc.company_id.logo" style="max-height: 100px;"/>
+                <br/>
+                <table style="border: solid black 1px; float:right; margin-bottom: 30px;">
+                    <tr>
+                        <td style="text-align:center; padding: 10px 50px; "><strong>PAYMENT VOUCHER</strong></td>
+                    </tr>
+                </table>
+                <br/>
+                
+                <t t-if="doc.payment_type == 'outbound'">
+                    <table class="table table-condensed">
+                        <tbody>
+                            <tr style="border: 0;">
+                                <td style="border: 0;">Payment To</td>
+                                <td style="border: 0;">: <span t-field="doc.partner_id.name"/></td>
+
+                                <td style="border: 0;">No Payment</td>
+                                <td style="border: 0;">: <span t-field="doc.name"/></td>
+                            </tr>
+                            <tr style="border: 0;">
+                                <td style="border: 0;">Payment From</td>
+                                <td style="border: 0;">: <span t-field="doc.journal_id"/></td>
+
+                                <td style="border: 0;">Rate</td>
+                                <td style="border: 0;">: <span t-field="doc.set_manual_currency"/></td>
+                            </tr>
+                            <tr style="border: 0;">
+                                <td style="border: 0;">Payment Date</td>
+                                <td style="border: 0;">: <span t-field="doc.payment_date"/></td>
+
+                                <td style="border: 0;">Create By</td>
+                                <td style="border: 0;">: <span t-field="doc.user_create_id.name"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </t>
+
+                <t t-if="doc.payment_type == 'inbound'">
+                    <table class="table table-condensed">
+                        <tbody>
+                            <tr style="border: 0;">
+                                <td style="border: 0;">Receive To</td>
+                                <td style="border: 0;">: <span t-field="doc.partner_id.name"/></td>
+
+                                <td style="border: 0;">No Receive</td>
+                                <td style="border: 0;">: <span t-field="doc.name"/></td>
+                            </tr>
+                            <tr style="border: 0;">
+                                <td style="border: 0;">Receive In</td>
+                                <td style="border: 0;">: <span t-field="doc.journal_id"/></td>
+
+                                <td style="border: 0;">Rate</td>
+                                <td style="border: 0;">: <span t-field="doc.set_manual_currency"/></td>
+                            </tr>
+                            <tr style="border: 0;">
+                                <td style="border: 0;">Receive Date</td>
+                                <td style="border: 0;">: <span t-field="doc.payment_date"/></td>
+
+                                <td style="border: 0;">Create By</td>
+                                <td style="border: 0;">: <span t-field="doc.user_create_id.name"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </t>
+
+                <div>
+                    <p t-if="doc.payment_type == 'outbound'">Payment Amount : <span t-esc="doc.currency_id.symbol + ' ' + '{0:,.2f}'.format(sum(line.amount_to_pay for line in doc.line_credit_ids)) + ' ' + doc.currency_id.name"/></p>
+                    <p t-if="doc.payment_type == 'inbound'">Receive Amount : <span t-esc="doc.currency_id.symbol + ' ' + '{0:,.2f}'.format(sum(line.amount_to_pay for line in doc.line_credit_ids)) + ' ' + doc.currency_id.name"/></p>
+                </div>
+                
+                <table class="table table-bordered table-condensed" style="border-color: #000000;">
+                    <thead>
+                        <tr style="border-color: #000000;">
+                            <th style="text-align:center; border-color: #000000;">Journal Items</th>
+                            <th style="text-align:center; border-color: #000000;">Date</th>
+                            <th style="text-align:center; border-color: #000000;">Due Date</th>
+                            <th style="text-align:center; border-color: #000000;">
+                                <span t-if="doc.payment_type == 'outbound'">Amount to Pay</span>
+                                <span t-if="doc.payment_type == 'inbound'">Amount Received</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="doc.line_credit_ids" t-as="line">
+                            <tr style="border-color: #000000;">
+                                <td class="text-center" style="border-color: #000000;"><span t-esc="line.move_line_id.move_id.name"/></td>
+                                <td class="text-center" style="border-color: #000000;"><span t-esc="'%s/%s/%s' % (line.date[5:7],line.date[8:10],line.date[:4])"/></td>
+                                <td class="text-center" style="border-color: #000000;"><span t-esc="'%s/%s/%s' % (line.date_due[5:7],line.date_due[8:10],line.date_due[:4])"/></td>
+                                <td class="text-center" style="border-color: #000000;"><span t-esc="doc.currency_id.symbol + ' ' + '{0:,.2f}'.format(line.amount_to_pay) + ' ' + doc.currency_id.name" /></td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+                <div style="margin-top:50px">
+                    <p><strong>Remarks</strong></p>
+                    <p><span><span t-field="doc.remark"/></span></p>
+                </div>
+
+                <div style="text-align: right; margin-bottom: 20px; margin-top: 20px; margin-right: 50px;">
+                    <span>Authorized by:</span>
+                    <br/><br/><br/>
+                    <span style="margin-right: 10px;">(signature)</span>
+                </div>
+            </div>
+        </t>
+     </template>
+</openerp>
+
